@@ -136,7 +136,7 @@
         const articleNo = getArticleNo();
 
         let formData = new FormData();
-        formData.set("articleNo", articleNO);
+        formData.set("articleNo", articleNo);
 
         fetch('/api/article/display', {
             method:'POST',
@@ -162,12 +162,14 @@
         }
     }
 
-    // 여기서부터 
-    
+    picture.addEventListener('change', onChangePicFileInput);
+
     function onSubmitHandler(){
         let isTitleAndPriceValid = checkTitleAndPrice();
 
-        if(isTitleAndPriceValid == True){
+        if(isTitleAndPriceValid === True){
+            const articleNo = getArticleNo();
+
             let headerData = new headers();
             let authToken = sessionStorage.getItem('authtoken');
             if(authToken){
@@ -188,23 +190,19 @@
             }).then((response) => {
                 return response.json();
             }).then((resBody) => {
-                console.log('create_article.onSubmitHandler.success:', resBody['success']);
-                console.log('create_article.onSubmitHandler.articleNO:', resBody['articleNo']);
-                window.location.replace('/home');
+                const articleNo = resBody['articleNo']
+                let url = '/display_article/' + articleNo;
+                window.location.replace(url);
             }).catch((error) => {
-                console.log('[Error]create_article.onSubmitHandler:', error);
+                console.log('[Error]update_article.onSubmitHandler:', error);
             });
         }
     }
-
-    let submitButton = document.querySelector('#submit_button');
-    submitButton.addEventListener('click', onSubmitHandler);
-
     function onCancelHandler(){
         history.back();
     }
 
-    let cancelButton = document.querySelector('#cancel_button');
+    submitButton.addEventListener('click', onSubmitHandler);
     cancelButton.addEventListener('click', onCancelHandler);
 </script>
 </body>
