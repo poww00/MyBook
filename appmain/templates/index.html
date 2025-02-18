@@ -56,6 +56,9 @@
 <script type="text/javascript" src="/static/js/navbar.js"></script>
 <script>
     const recentArticleDiv = document.querySelector('#recent_articles_div');
+    const searchInput =document.querySelector('#search_input');
+    const searchButton = document.querySelector('#search_button');
+    const searchResultDiv = document.querySelector('#search_result_div');
 
     function displayRecentArticles(articles){
         articles.forEach((article) => {
@@ -93,5 +96,83 @@
             console.log('[Error]getRecentArticles():', error);
         });
     }
+    // 검색 결과를 페이지에 표시
+    function displaySearchResults(articles) {
+        // forEach()함수는 배열의 각 원소에 해당하는 상품 게시정보를 순서대로 방문
+        articles.forEach((article) => {
+            let articleNo = article["articleNo"];
+            let title = article["title"];
+            let desc = article["desc"];
+
+            let cardDiv = document.createElement('div');
+            cardDiv.className = 'card mt-2';
+
+            let articleElement = `
+                <h5 class="card-header">
+                    <a class="link-primary text-decoration-none" href="/display_article/${articleNo}">
+                        ${title}
+                    </a>
+                </h5>
+                <p class="card-text text-truncate px-3 py-2">
+                    <a class="link-secondary text-decoration-none" href="/display_article/${articleNo}">
+                        ${desc}
+                    </a>
+                </p>
+            `;
+
+            cardDiv.innerHTML = articleElement;
+            searchResultDiv.appendChild(cardDiv);
+        });
+        let vacantDiv = document.createElement('div');
+        vacantDiv.className = 'card mt-5';
+        vacantDiv.style = 'border: None;';
+        searchResultDiv.appendChild(vacantDiv);
+    }
+    
+    // 검색창에 입력한 키워드로 서버에 검색을 요청하고
+    function searchArticle() {
+        let searchKetword = searchInput.value;
+        
+        if (searchKeyword.length> 0) {
+        
+            let formData = new FormData();
+
+            formData.set("searchKeyword", searchKeyword);
+            // 검색을 요청한다.
+            fetch('/api/article/search', {
+                method: 'POST',
+                body: formData
+            }).then((response) => {
+                return response.json();
+            }).then((resBody) => {
+                // 서버로부터 검색 결과를 받으면 메인 페이지의 게시물을 제거한다.
+                recentArticleDiv.parentElement.remove();
+                const prevSR = searchResultDiv.querySelectorAll('.card');
+
+                if (prevSR.length > 0) {
+                    prevSR.forEach((prevItem) => {
+                        prevItem.remove();
+                    });
+                }
+                // 검색결과를 전달한다.
+                if (resBody["success"] == True) {
+                    displaySearchResults(resBody["articles"]);
+                }
+                else{
+                    let cardDiv = document.createElement('div');
+                    cardDiv.className = 'card mt-2 text-center';
+                    cardDiv.style = 'border: None;';
+
+                    const noSR = '<p>죄송합니다. 상품을 찾을 수 없습니다. </p>';
+
+                    cardDiv.innerHTML = noSR;
+                    searchResultDiv.appendChild(cardDiv);
+                }
+            }).catch((error) => {
+                console.log('[Error]searchArticle():', error);
+            });
+        }
+    }
+    searchButton.addEventListener('click', searchArticle);
 </script>
 </html>

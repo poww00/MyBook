@@ -303,5 +303,32 @@ def deleteArticle():
             pass
     else: # if authToken:
         pass
-
     return make_response(jsonify(payload), 200)  #75p
+
+# 상품 검색
+@article.route('/api/article/search', method=['POST'])
+def searchArticles():
+    data = request.form
+
+    searchKeyword = data.get("searchKeyword")
+
+    payload = {"success": False}
+
+    conn = sqlite3.connect('myBook.db')
+    cursor = conn.cursor()
+
+    if cursor:
+        SQL = 'SELECT articleNo, author, title, category, description, price, pictute FROM article WHERE title LIKE "%{skwd}%" ORDER BY articleNo DESC'.format(skwd=searchKeyword)
+        cursor.execute(SQL)
+        result = cursor.fetchall()
+
+        cursor.close()
+        conn.close()
+        searchResults = []
+
+        if len(result) > 0:
+            for article in result:
+                searchResults.append({"articleNo": article[0], "title": article[2], "desc": article[4]})
+            payload = {"success": True, "articles": searchResults}
+        return make_response(jsonify(payload), 200)
+    
