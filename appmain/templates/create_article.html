@@ -101,7 +101,7 @@
     function onSubmitHandler(){
         let isTitleAndPriceValid = checkTitleAndPrice();
 
-        if(isTitleAndPriceValid == True){
+        if(isTitleAndPriceValid === True){
             let headerData = new headers();
             let authToken = sessionStorage.getItem('authtoken');
             if(authToken){
