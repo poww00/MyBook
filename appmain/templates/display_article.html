@@ -114,9 +114,47 @@
                 
                 confirmDeletionDiv.innerHTML = confirmDeletionButtons;
 
-                //59p function onConfirmDeletionHandler
+                function onConfirmDeletionHandler(){
+                    let headerData = new Headers();
+                    let authToken = sessionStorage.getItem("authtoken");
+                    if(authToken){
+                        headerData.set("authtoken", authToken);
+                    }
+
+                    let formData = new FormData();
+
+                    fetch('/api/article/delete', {
+                        method:'POST',
+                        headers:headerData,
+                        body:formData
+                    }).then((response)=>{
+                        return response.json();
+                    }).then((resBody)=>{
+                        let url = '/home';
+                        window.location.replace(url);
+                    }).catch((error)=>{
+                        console.log('[Error]delete_article.onConfirmDeletionHandler:', error);
+                    });
+                }
+
+                function onCancelHandler(){
+                    confirmDeletionDiv.innerHTML='';
+                }
+
+                const confirmButton = document.querySelector('#confirm_button');
+                const cancelButton = document.querySelector('#cancel_button');
+
+                confirmButton.addEventListener('click', onConfirmDeletionHandler);
+                cancelButton.addEventListener('click', onCancelHandler);
             }
+
+            const editButton = document.querySelector('#edit_button');
+            const deleteButton = document.querySelector('#delete_button');
+
+            editButton.addEventListener('click', onConfirmDeletionHandler);
+            cancelButton.addEventListener('click',onCancelHandler);
         }
+
 
         let descDiv = document.createElement('div');
         descDiv.className = 'col-9';
