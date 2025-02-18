@@ -76,7 +76,7 @@ def getAuth():
         if pwMatch:
             authKey = secrets.token_hex(16)
 
-            SQL = "UPDATA users SET authkey=? WHERE id=?"
+            SQL = "UPDATE users SET authkey=? WHERE id=?"
             cursor.execute(SQL, (authKey, id))
             conn.commit()
 
@@ -111,7 +111,7 @@ def getMyInfo():
             email = token['email']
 
             conn = sqlite3.connect('myBook.db')
-            cursor = conn.close()
+            cursor = conn.cursor()
 
             if cursor:
                 SQL = 'SELECT username FROM user WHERE email=?'
@@ -135,7 +135,7 @@ def updateMyInfo():
     username = data.get("username")
     passwd = data.get("passwd")
 
-    payload = {"success", False}
+    payload = {"success": False}
 
     if authToken:
         isValid = verifyJWT(authToken)
