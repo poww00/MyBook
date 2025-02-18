@@ -162,3 +162,63 @@ def updateArticle():
     return make_response(jsonify(payload), 200)
 
 # 상품 게시물 정보 삭제
+@article.route('/api/article/delete', methods=["POST"])
+def deleteArticle():
+    headerData = request.headers
+    data = request.form
+
+    authToken = headerData.get("authtoken")
+
+    payload = {"success":False}
+
+    if authToken:
+        isValid = verifyJWT(authToken)
+
+        if isValid:
+            token = getJWTContent(authToken)
+            username = token['username']
+
+            articleNo = data.get('articleNo')
+            conn = sqlite3.connect('myBook.db')
+            cursor = conn.cursor()
+
+            if cursor:
+                SQL = 'SELECT author, picture FROM articles WHERE articleNo=?'
+                cursor.execute(SQL, (articleNo,))
+                result = cursor.fetchone()
+                cursor.close()
+            conn.close()
+
+            if(result[0] == username):
+                conn = sqlite3.connect('myBook.db')
+                cursor = conn.cursor()
+
+                picture = result[1]
+
+                if(picture):
+                    picFilePath = os.path.join(app.static_folder, 'pics', username, picture)
+
+                    if os.path.isfile(picFilePath):
+                        os.remove(picFilePath)
+                    else:
+                        pass
+                else:
+                    pass
+
+                if cursor:
+                    SQL = 'DELETE FROM articles WHERE articleNo=?'
+                    cursor.execute(SQL, (articleNo,))
+                    conn.commit()
+                    cursor.close()
+                conn.close()
+
+                print('article deleted:%s' % articleNo)
+                payload = {'success':True}
+            else: # if(result[0]==username):
+                pass
+        else: # if isvalid:
+            pass
+    else: # if authToken:
+        pass
+
+    return make_response(jsonify(payload), 200)
