@@ -70,7 +70,8 @@ def getReply():
             cursor.execute(SQL, (articleNo, baseIndex, numReplyRead))
             result = cursor.fetchall()
 
-            SQL = 'SELECT COUNT(*) FROM replies WHERE targetArticle=?' cursor.execute(SQL, (articleNo))
+            SQL = 'SELECT COUNT(*) FROM replies WHERE targetArticle=?' 
+            cursor.execute(SQL, (articleNo))
             numTotalReply = cursor.fetchone()[0]
 
             cursor.close()
