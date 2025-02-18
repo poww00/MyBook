@@ -4,7 +4,7 @@ import os
 from appmain import app
 from appmain.utils import verifyJWT, getJWTContent, savePic
 
-article = Blueprint('article',__name__)
+article = Blueprint('article',__name__) #38p
 
 @article.route('/create_article')
 def createArticlePage():
@@ -63,14 +63,14 @@ def createArticle():
             pass
     else:
         pass
-    return make_response(jsonify(payload), 200)
+    return make_response(jsonify(payload), 200) #38p
 
-# 상품 게시물 정보 수정 페이지
+# 상품 게시물 정보 수정 페이지 #69p
 @article.route('/update_article/<int:articleNo>',methods=['GET'])
 def updateArticlePage(articleNo):
-    return send_from_directory(app.root_path, 'templates/update_article.html')
+    return send_from_directory(app.root_path, 'templates/update_article.html') #69p
 
-# 상품 게시물 정보 수정
+# 상품 게시물 정보 수정 #70p
 @article.route('/api/article/update', methods=['POST'])
 def updateArticle():
     headerData = request.headers
@@ -159,9 +159,9 @@ def updateArticle():
             pass
     else:
         pass
-    return make_response(jsonify(payload), 200)
+    return make_response(jsonify(payload), 200) #70p
 
-# 상품 게시물 정보 삭제
+# 상품 게시물 정보 삭제 #75p
 @article.route('/api/article/delete', methods=["POST"])
 def deleteArticle():
     headerData = request.headers
@@ -221,4 +221,4 @@ def deleteArticle():
     else: # if authToken:
         pass
 
-    return make_response(jsonify(payload), 200)
+    return make_response(jsonify(payload), 200)  #75p
