@@ -1,6 +1,8 @@
 from flask import Blueprint, send_from_directory, make_response, jsonify, request
 import sqlite3
 import bcrypt
+import secrets
+import jwt
 
 from appmain import app
 
@@ -39,4 +41,53 @@ def register():
 
     payload = {"success": True}
     return make_response(jsonify(payload), 200)
+
+@user.route('/signin')
+def signin():
+    return send_from_directory(app.root_path, 'templates/signin.html')
+
+@user.route('/api/user/signin', methods=['POST'])
+def getAuth():
+
+    data = request.form
+
+    email = data.get("email")
+    passwd = data.get("passwd")
+
+    conn = sqlite3.connect('myBook.db')
+    cursor = conn.cursor()
+
+    payload = {"authenticated": False, "email": '', "username": "", "authtoken": ""}
+
+    if cursor:
+        SQL = 'SELECT id, username, passwd FROM users WHERE email=?'
+        cursor.execute(SQL, (email,))
+        result = cursor.fetchone()
+
+        if result:
+            pwMatch = bcrypt.checkpw(passwd.encode("utf-8"), result[2])
+            id = result[0]
+            username = result[1]
+        else:
+            pwMatch = None
+
+        if pwMatch:
+            authKey = secrets.token_hex(16)
+
+            SQL = "UPDATA users SET authkey=? WHERE id=?"
+            cursor.execute(SQL, (authKey, id))
+            conn.commit()
+
+            token = jwt.encode({"id": id, "email": email, "username": username, "authkey": authKey}
+                               , app.config["SECRET_KEY"], algorithm='HS256')
+            payload = {"authenticated": True, "email": email, "username": username, "authtoken": token}
+
+        else:
+            pass
+
+        cursor.close()
+    conn.close()
+
+    return make_response(jsonify(payload), 200)
+
     
