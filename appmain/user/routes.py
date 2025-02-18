@@ -93,7 +93,7 @@ def getAuth():
     return make_response(jsonify(payload), 200)
 
 @user.route('/myinfo')
-def getMyInfo():
+def myPage():
     return send_from_directory(app.root_path, 'templates/mypage.html')
 
 @user.route('/api/user/myinfo', methods = ['POST'])
